@@ -21,14 +21,12 @@ function groupByDay(events, tz) {
 export default function EventList({ viewerTimezone }) {
   const dispatch = useDispatch();
   
-  // 1. Redux Store Selectors (using 'users' to match store configuration)
   const users = useSelector((state) => state.users?.items || []);
   const activeUserId = useSelector(
     (state) => state.session?.activeUserId || state.session?.activeProfileId
   );
   const activeUser = users.find((p) => p._id === activeUserId);
 
-  // Use passed timezone prop, fallback to active user's timezone, or UTC
   const viewerTz = viewerTimezone || activeUser?.timezone || 'UTC';
 
   const { items: events = [], status } = useSelector((state) => state.events || {});
@@ -36,14 +34,12 @@ export default function EventList({ viewerTimezone }) {
   const [editingEvent, setEditingEvent] = useState(null);
   const [historyEvent, setHistoryEvent] = useState(null);
 
-  // 3. Load Events when Active User Changes
   useEffect(() => {
     if (activeUserId) {
       dispatch(loadEvents(activeUserId));
     }
   }, [dispatch, activeUserId]);
 
-  // 4. Filter events for current active user
   const userEvents = useMemo(() => {
     if (!activeUserId) return [];
     return events.filter((event) => {
@@ -55,7 +51,6 @@ export default function EventList({ viewerTimezone }) {
     });
   }, [events, activeUserId]);
 
-  // 5. Group Filtered Events by Day
   const grouped = useMemo(() => groupByDay(userEvents, viewerTz), [userEvents, viewerTz]);
 
   return (
@@ -95,7 +90,7 @@ export default function EventList({ viewerTimezone }) {
       )}
 
       {historyEvent && (
-        <EventLogModal event={historyEvent} onClose={() => setHistoryEvent(null)} />
+        <EventLogModal event={historyEvent} viewerTz={viewerTz} onClose={() => setHistoryEvent(null)} />
       )}
     </section>
   );

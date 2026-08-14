@@ -17,7 +17,7 @@ const FIELD_LABELS = {
 function renderValue(field, value, tz, profileNameById) {
   if (value === undefined || value === null || value === '') return '—';
   if (field === 'startAt' || field === 'endAt') {
-    return formatInTimezone(value, tz);
+    return formatInTimezone(value, tz, 'DD MMM YYYY, hh:mm A');
   }
   if (field === 'users') {
     const ids = Array.isArray(value) ? value : [value];
@@ -26,15 +26,15 @@ function renderValue(field, value, tz, profileNameById) {
   return String(value);
 }
 
-export default function EventLogModal({ event, onClose }) {
+export default function EventLogModal({ event, viewerTz: propViewerTz, onClose }) {
   const dispatch = useDispatch();
   const logs = useSelector((state) => state.events?.logsByEventId?.[event?._id]) || [];
   const logsStatus = useSelector((state) => state.events?.logsStatus);
   const users = useSelector((state) => state.users?.items || []);
-  const activeProfileId = useSelector((state) => state.session?.activeProfileId);
+  const activeProfileId = useSelector((state) => state.session?.activeUserId);
 
   const activeProfile = users.find((p) => p?._id === activeProfileId);
-  const viewerTz = activeProfile?.timezone || 'UTC';
+  const viewerTz = propViewerTz || activeProfile?.timezone || 'UTC';
 
   const profileNameById = users.reduce((acc, p) => {
     acc[p?._id] = p.name;
@@ -65,7 +65,7 @@ export default function EventLogModal({ event, onClose }) {
                   <span className="log-old">
                     {renderValue(c.field, c.oldValue, viewerTz, profileNameById)}
                   </span>{' '}
-                  →{' '}
+                  {'--->  '}
                   <span className="log-new">
                     {renderValue(c.field, c.newValue, viewerTz, profileNameById)}
                   </span>
