@@ -10,6 +10,8 @@ export default function CreateEventCard({ onOpenAddProfile }) {
   const users = useSelector((state) => state.users?.items || []);
 
   const [form, setForm] = useState({
+    title: '',
+    description: '',
     profileIds: [],
     timezone: 'America/New_York',
     startDate: '',
@@ -33,21 +35,24 @@ export default function CreateEventCard({ onOpenAddProfile }) {
     e.preventDefault();
     setError('');
 
+    if (!form.title.trim()) return setError('Event title is required');
     if (form.profileIds.length === 0) return setError('Select at least one profile');
     if (!form.startDate || !form.startTime) return setError('Start Date & Time required');
     if (!form.endDate || !form.endTime) return setError('End Date & Time required');
 
     const startAt = toUtcISOString(form.startDate, form.startTime, form.timezone);
     const endAt = toUtcISOString(form.endDate, form.endTime, form.timezone);
+
     if (new Date(endAt) <= new Date(startAt)) {
       return setError('End time must be after start time');
     }
-    
+
     setSubmitting(true);
     try {
       await dispatch(
         createEventThunk({
-          title: 'Event',
+          title: form.title.trim(),
+          description: form.description.trim(),
           users: form.profileIds,
           timezone: form.timezone,
           startAt,
@@ -55,8 +60,9 @@ export default function CreateEventCard({ onOpenAddProfile }) {
         })
       ).unwrap();
 
-      // Reset
       setForm({
+        title: '',
+        description: '',
         profileIds: [],
         timezone: 'America/New_York',
         startDate: '',
@@ -75,6 +81,28 @@ export default function CreateEventCard({ onOpenAddProfile }) {
     <div className="card create-event-card">
       <h3>Create Event</h3>
       <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Event Title</label>
+          <input
+            type="text"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="e.g. Sprint Planning / Team Sync"
+            maxLength={150}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Description (Optional)</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="Add agenda or meeting details..."
+            maxLength={1000}
+            rows={2}
+          />
+        </div>
+
         <div className="form-group">
           <label>Profiles</label>
           <ProfileDropdown

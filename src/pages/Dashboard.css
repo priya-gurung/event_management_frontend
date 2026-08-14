@@ -65,7 +65,7 @@ body {
 
 /* Form Controls */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
@@ -76,8 +76,10 @@ body {
   margin-bottom: 8px;
 }
 
-/* Standard Selects & Inputs styling */
+/* Unified Inputs, Textarea & Selects styling (Fixes Event Title & Description) */
 .form-group select,
+.form-group input[type="text"],
+.form-group textarea,
 .datetime-row input {
   width: 100%;
   padding: 10px 14px;
@@ -85,13 +87,28 @@ body {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
+  font-family: inherit;
   color: #334155;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.4;
 }
 
 .form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
 .datetime-row input:focus {
   border-color: #635bff;
   background-color: #ffffff;
@@ -120,15 +137,19 @@ body {
   font-size: 14px;
   cursor: pointer;
   margin-top: 8px;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.05s ease;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 6px;
 }
 
-.btn-primary-purple:hover {
+.btn-primary-purple:hover:not(:disabled) {
   background-color: #5248e2;
+}
+
+.btn-primary-purple:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .btn-primary-purple:disabled {
