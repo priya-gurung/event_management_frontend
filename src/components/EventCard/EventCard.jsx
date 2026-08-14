@@ -3,13 +3,15 @@ import useTimezoneConversion from '../../hooks/useTimezoneConversion';
 import './EventCard.css';
 
 export default function EventCard({ event, viewerTz, onEdit, onViewHistory }) {
+  if (!event) return null;
+
   const start = useTimezoneConversion(event.startAt, viewerTz);
   const end = useTimezoneConversion(event.endAt, viewerTz, 'hh:mm A');
   const createdAt = useTimezoneConversion(event.createdAt, viewerTz, 'DD MMM YYYY, hh:mm A');
   const updatedAt = useTimezoneConversion(event.updatedAt, viewerTz, 'DD MMM YYYY, hh:mm A');
   const wasUpdated = event.createdAt !== event.updatedAt;
 
-  const userList = event.users || [];
+  const userList = Array.isArray(event.users) ? event.users : [];
 
   return (
     <div className="event-card">
@@ -21,10 +23,8 @@ export default function EventCard({ event, viewerTz, onEdit, onViewHistory }) {
           {start} – {end} <span className="event-card-tz">({viewerTz})</span>
         </div>
 
-        {/* User Badges / Profiles */}
         <div className="event-card-profiles">
-          {userList.map((user) => {
-            // Handle populated user object vs raw string ID
+          {userList.map((user) => { 
             const userId = typeof user === 'string' ? user : user._id;
             const userName = typeof user === 'string' ? user : user.name;
 

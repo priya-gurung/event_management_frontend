@@ -1,10 +1,12 @@
-import React from 'react';
+import {React, useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveUser } from '../store/slices/sessionSlice';
 import ProfileDropdown from './ProfileDropdown/ProfileDropdown'; 
+import ProfileManager from './ProfileManager/ProfileManager';
 
 const Header = ({ onAddProfile }) => {
   const dispatch = useDispatch();
+  const [showProfileManager, setShowProfileManager] = useState(false);
 
   const users = useSelector((state) => state.users?.items || []);
   const activeUserId = useSelector(
@@ -23,9 +25,12 @@ const Header = ({ onAddProfile }) => {
           selectedId={activeUserId}
           placeholder="Select current profile..."
           onSelect={(id) => dispatch(setActiveUser(id))}
-          onAddProfile={onAddProfile}
+          onAddProfile={() => setShowProfileManager(true)}
         />
       </div>
+      {showProfileManager && (
+        <ProfileManager onClose={() => setShowProfileManager(false)} />
+      )}
     </header>
   );
 };
