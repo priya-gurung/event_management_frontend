@@ -1,9 +1,14 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE_URL = rawBase.replace(/\/+$/, '').replace(/\/api$/, '') + '/api';
 
 const apiClient = async (endpoint, options = {}) => {
   const { params, body, headers, ...customConfig } = options;
 
-  let url = `${BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const pathWithoutApi = cleanEndpoint.replace(/^\/api/, '');
+
+  let url = `${BASE_URL}${pathWithoutApi}`;
+  
   if (params && Object.keys(params).length > 0) {
     const queryString = new URLSearchParams(params).toString();
     url += `?${queryString}`;
